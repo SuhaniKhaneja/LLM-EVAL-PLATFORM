@@ -64,7 +64,7 @@ llm-eval-platform/
 
 ```bash
 # 1. Clone
-git clone https://github.com/YOUR_USERNAME/llm-eval-platform.git
+git clone https://github.com/SuhaniKhaneja/llm-eval-platform.git
 cd llm-eval-platform
 
 # 2. Create virtual environment
