@@ -1,8 +1,8 @@
 import streamlit as st
 import httpx
 import pandas as pd
-
-API = "http://localhost:8000/api/v1"
+import os
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="LLM Eval Platform", layout="wide")
 st.title("LLM Evaluation Platform")
