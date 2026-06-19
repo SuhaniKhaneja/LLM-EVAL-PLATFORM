@@ -1,6 +1,10 @@
 import time
-import httpx
+import os
+from openai import AsyncOpenAI
 from dataclasses import dataclass
+
+client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 @dataclass
 class LLMResult:
@@ -10,27 +14,19 @@ class LLMResult:
     completion_tokens: int
     latency_ms: float
 
+
 async def call_llm(prompt: str, max_tokens: int = 512) -> LLMResult:
     start = time.time()
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "tinyllama",
-                "prompt": prompt,
-                "stream": False
-            },
-            timeout=60
-        )
-
-    data = response.json()
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=max_tokens,
+    )
     latency = (time.time() - start) * 1000
-
     return LLMResult(
-        text=data["response"],
-        model="tinyllama",
-        prompt_tokens=0,
-        completion_tokens=0,
-        latency_ms=latency
+        text=response.choices[0].message.content,
+        model="gpt-4o-mini",
+        prompt_tokens=response.usage.prompt_tokens,
+        completion_tokens=response.usage.completion_tokens,
+        latency_ms=latency,
     )
