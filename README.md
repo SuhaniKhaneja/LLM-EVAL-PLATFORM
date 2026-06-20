@@ -1,120 +1,72 @@
 # LLM Evaluation Platform
 
-A full-stack system for evaluating Large Language Model responses using automated quality metrics. Built with FastAPI, async SQLAlchemy, and Streamlit.
+Most teams building LLM applications have no systematic way to measure 
+if their model is actually performing well. This platform automates that 
+— every response gets scored, stored, and surfaced through a live dashboard.
+
+**Live Demo:** https://llm-eval-platform-xz5k2xgthctg3na4j8rtn4.streamlit.app/
 
 ---
 
-## What It Does
+## What it does
 
-Most LLM projects skip evaluation. This platform makes it systematic — every response gets scored across four metrics, stored in a database, and served through a REST API and a dashboard.
+Submit any prompt → Groq Llama 3.1 generates a response → 
+the evaluation engine scores it across 4 dimensions → 
+results are stored and queryable instantly.
 
-**Pipeline:**
-```
-User Input → FastAPI → LLM → Evaluation Engine → SQLite → Metrics API → Streamlit UI
-```
+Every evaluation returns:
+- **ROUGE-1** — text similarity against a reference answer
+- **Toxicity score** — automated detection via Detoxify
+- **Length score** — appropriateness of response length
+- **Composite score** — weighted overall quality
 
 ---
 
-## Features
+## Why I built it
 
-- **Evaluate** any LLM response against a reference answer
-- **4 Metrics computed per evaluation:**
-  - ROUGE-1 similarity score
-  - Toxicity detection (binary)
-  - Length score
-  - Composite overall score
-- **REST API** with `/evaluate`, `/logs`, and `/metrics` endpoints
-- **Streamlit dashboard** — Evaluate, Logs, and Metrics tabs
-- **Async backend** — handles concurrent requests without blocking
-- **Persistent storage** via async SQLAlchemy + SQLite
+At my internship, I was manually evaluating 10,000+ LLM outputs 
+across 8 quality benchmarks. It was slow, inconsistent, and didn't 
+scale. I built this so that evaluation becomes infrastructure, 
+not a manual chore.
 
 ---
 
 ## Tech Stack
 
-| Layer      | Technology                          |
-|------------|--------------------------------------|
-| Backend    | FastAPI (async)                      |
-| ORM / DB   | Async SQLAlchemy + SQLite            |
-| Frontend   | Streamlit                            |
-| NLP        | rouge-score, detoxify                |
-| Validation | Pydantic                             |
-
----
-
-## Project Structure
-
-```
-llm-eval-platform/
-├── app/
-│   ├── main.py           # FastAPI entry point
-│   ├── routes/           # API route handlers
-│   ├── services/         # Business logic + evaluation engine
-│   ├── schemas/          # Pydantic models
-│   └── db/               # Async SQLAlchemy setup
-├── frontend/
-│   └── app.py            # Streamlit UI
-├── requirements.txt
-└── README.md
-```
-
----
-
-## Setup
-
-```bash
-# 1. Clone
-git clone https://github.com/SuhaniKhaneja/llm-eval-platform.git
-cd llm-eval-platform
-
-# 2. Create virtual environment
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Initialize database
-python -m app.db.init_db
-
-# 5. Start backend
-uvicorn app.main:app --reload --port 8000
-
-# 6. Start frontend (new terminal)
-streamlit run frontend/app.py
-```
-
-**API docs:** http://localhost:8000/docs  
-**Streamlit UI:** http://localhost:8501
+| Layer      | Technology                        |
+|------------|-----------------------------------|
+| Backend    | FastAPI (async)                   |
+| Frontend   | Streamlit                         |
+| LLM        | Groq Llama 3.1                    |
+| Database   | SQLite + Async SQLAlchemy         |
+| Validation | Pydantic                          |
+| NLP        | rouge-score, Detoxify             |
+| Deployed   | Render (backend) + Streamlit Cloud|
 
 ---
 
 ## API Endpoints
 
-| Method | Endpoint    | Description                              |
-|--------|-------------|------------------------------------------|
-| POST   | /evaluate   | Submit response + reference → get scores |
-| GET    | /logs       | Paginated evaluation history             |
-| GET    | /metrics    | Aggregated stats (mean scores, toxicity) |
-| GET    | /health     | API + DB health check                    |
+| Method | Endpoint          | Description         |
+|--------|-------------------|---------------------|
+| POST   | /api/v1/evaluate  | Evaluate a prompt   |
+| GET    | /api/v1/logs      | Full evaluation history |
+| GET    | /api/v1/metrics   | Aggregate metrics   |
+| GET    | /health           | Health check        |
+
+API Docs: https://llm-eval-platform-lfg1.onrender.com/docs
 
 ---
 
-## Why This Project
+## What's next
 
-Evaluation is the hardest part of building with LLMs. This platform implements a repeatable, automated evaluation pipeline — the same pattern used in production ML systems — rather than relying on manual spot-checks.
-
----
-
-## Roadmap
-
-- [ ] LLM-as-judge for factual accuracy scoring
-- [ ] Semantic similarity via sentence-transformers
-- [ ] Batch evaluation endpoint
-- [ ] Model comparison mode (same prompt, multiple backends)
+- LLM-as-a-Judge scoring
+- Semantic similarity via sentence-transformers  
+- Multi-model comparison mode
+- Batch evaluation + CSV/PDF export
 
 ---
 
-## License
+## Note
 
-MIT
+Hosted on free-tier services. The first request after inactivity may take some time while the backend wakes up..
