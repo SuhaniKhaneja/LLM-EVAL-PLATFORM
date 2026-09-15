@@ -21,14 +21,14 @@ class LLMResult:
 async def call_llm(prompt: str, max_tokens: int = 512) -> LLMResult:
     start = time.time()
     response = await client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="openai/gpt-oss-20b",
         messages=[{"role": "user", "content": prompt}],
         max_tokens=max_tokens,
     )
     latency = (time.time() - start) * 1000
     return LLMResult(
         text=response.choices[0].message.content,
-        model="llama-3.1-8b-instant",
+        model="openai/gpt-oss-20b",
         prompt_tokens=response.usage.prompt_tokens,
         completion_tokens=response.usage.completion_tokens,
         latency_ms=latency,
