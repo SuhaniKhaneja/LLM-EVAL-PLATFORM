@@ -7,3 +7,5 @@ eval.db
 eval.backup.*.db
 eval.pre-migration.*.db
 *.patch
+/venv/
+/.venv/
