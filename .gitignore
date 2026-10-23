@@ -1,5 +1,9 @@
-.venv/
-__pycache__/
-*.pyc
-eval.db
+venv/
 .env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+eval.db
+eval.backup.*.db
+eval.pre-migration.*.db
+*.patch

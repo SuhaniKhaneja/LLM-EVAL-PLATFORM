@@ -1,17 +1,28 @@
+
 from datetime import datetime
+
 from pydantic import BaseModel, Field
+
 
 class EvaluateRequest(BaseModel):
     prompt: str = Field(..., min_length=1, max_length=4000)
-    reference: str = Field(default="", description="Optional reference text for ROUGE scoring")
+    reference: str = Field(
+        default="",
+        max_length=10000,
+        description="Optional reference answer for ROUGE and BLEU scoring",
+    )
     max_tokens: int = Field(default=512, ge=1, le=4096)
+
 
 class ScoresOut(BaseModel):
     length_score: float
-    rouge1_score: float
+    rouge1_score: float | None = None
+    rouge_l_score: float | None = None
+    bleu_score: float | None = None
     toxicity_score: float
     is_toxic: bool
     overall_score: float
+
 
 class EvaluateResponse(BaseModel):
     prompt_id: str
@@ -26,6 +37,7 @@ class EvaluateResponse(BaseModel):
     scores: ScoresOut
     created_at: datetime
 
+
 class LogEntry(BaseModel):
     prompt_id: str
     response_id: str
@@ -37,13 +49,16 @@ class LogEntry(BaseModel):
     overall_score: float
     is_toxic: bool
     created_at: datetime
+
     model_config = {"from_attributes": True}
+
 
 class PaginatedLogs(BaseModel):
     total: int
     page: int
     page_size: int
     items: list[LogEntry]
+
 
 class MetricsOut(BaseModel):
     total_evaluations: int
